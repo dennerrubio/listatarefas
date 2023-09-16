@@ -18,18 +18,35 @@ export default class Main extends React.Component {
   handleClick = () => {
     const { tarefas } = this.state;
     let { inputText } = this.state;
-    if (inputText.length !== 0) {
+    if (inputText.trim().length === 0) {
+      this.setState({ inputText: '' });
+      alert('Insira um Texto');
+    } else {
       inputText = inputText.trim();
       this.setState({ tarefas: [...tarefas, inputText] });
       this.setState({ inputText: '' });
-    } else {
-      alert('Não é possível criar uma tarefa sem texto.');
     }
   };
 
-  handleRemove(e) {
+  handleEdit = (e, index) => {
+    let { inputText } = this.state;
+    if (inputText.trim().length === 0) {
+      const { tarefas } = this.state;
+      this.setState({ inputText: tarefas[index] });
+      this.handleRemove(e, index);
+    } else {
+      alert(
+        'Não é possivel editar uma tarefa enquanto houver texto na caixa de texto.'
+      );
+    }
+  };
+
+  handleRemove = (e, index) => {
     const { tarefas } = this.state;
-  }
+    const tarefasRemove = [...tarefas];
+    tarefasRemove.splice(index, 1);
+    this.setState({ tarefas: [...tarefasRemove] });
+  };
 
   render() {
     const { tarefas, inputText } = this.state;
@@ -51,17 +68,20 @@ export default class Main extends React.Component {
           </button>
         </div>
         <ul className="max-w-2xl mx-auto">
-          {tarefas.map((e) => (
+          {tarefas.map((e, index) => (
             <li
               key={e}
               className="flex justify-between text-white bg-bluewood-800 hover:bg-sundance-600 my-3 px-2 py-1 transition-all"
             >
               {e}{' '}
               <div className="flex items-center gap-2 pl-3 align-middle">
-                <FaMarker className="hover:text-sundance-200 cursor-pointer" />
+                <FaMarker
+                  className="hover:text-sundance-200 cursor-pointer"
+                  onClick={(e) => this.handleEdit(e, index)}
+                />
                 <FaTrash
                   className="hover:text-sundance-200 cursor-pointer"
-                  onClick={this.handleRemove}
+                  onClick={(e) => this.handleRemove(e, index)}
                 />
               </div>
             </li>
