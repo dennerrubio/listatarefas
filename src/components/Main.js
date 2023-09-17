@@ -4,12 +4,24 @@ import { FaArrowTurnDown, FaMarker, FaTrash } from 'react-icons/fa6';
 export default class Main extends React.Component {
   state = {
     inputText: '',
-    tarefas: [
-      'Acordar',
-      'Tomar café',
-      'Dar carinho no gato antes de ir trabalhar se não ele fica triste',
-    ],
+    tarefas: [],
   };
+
+  componentDidMount() {
+    const tarefas = JSON.parse(localStorage.getItem('tarefas'));
+    if (!tarefas) {
+      return;
+    }
+    this.setState({ tarefas });
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    const { tarefas } = this.state;
+    if (tarefas === prevState.tarefas) {
+      return;
+    }
+    localStorage.setItem('tarefas', JSON.stringify(tarefas));
+  }
 
   handleValor = (e) => {
     this.setState({ inputText: e.target.value });
@@ -25,6 +37,21 @@ export default class Main extends React.Component {
       inputText = inputText.trim();
       this.setState({ tarefas: [...tarefas, inputText] });
       this.setState({ inputText: '' });
+    }
+  };
+
+  handleKey = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    if (event.code === 'Enter') {
+      const { tarefas } = this.state;
+      let { inputText } = this.state;
+      if (inputText.trim().length === 0) {
+        this.setState({ inputText: '' });
+        alert('Insira um Texto');
+      } else {
+        inputText = inputText.trim();
+        this.setState({ tarefas: [...tarefas, inputText] });
+        this.setState({ inputText: '' });
+      }
     }
   };
 
@@ -52,10 +79,11 @@ export default class Main extends React.Component {
     const { tarefas, inputText } = this.state;
 
     return (
-      <main className="bg-white max-w-2xl container shadow-xl mt-28 mx-auto px-4 py-8">
+      <main className="bg-white max-w-2xl container shadow-xl mt-16 mx-auto px-4 py-8">
         <div className="flex justify-center py-2">
           <input
             onChange={this.handleValor}
+            onKeyDown={this.handleKey}
             type="text"
             value={inputText}
             className="text-bluewood-900 font-semibold indent-2 max-w-xl w-full border-2 border-bluewood-800 outline-none mr-2"
